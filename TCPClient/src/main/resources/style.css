@@ -1,0 +1,12 @@
+.root { -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; -fx-background-color: #f4f6fb; }
+.title { -fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f2a44; }
+.hint { -fx-text-fill: #6b7690; -fx-font-size: 12px; }
+.error { -fx-text-fill: #c62828; }
+.online { -fx-text-fill: #1b8a3a; -fx-font-weight: bold; }
+.offline { -fx-text-fill: #c62828; -fx-font-weight: bold; }
+.readonly { -fx-text-fill: #b26a00; -fx-font-weight: bold; }
+.text-area { -fx-font-size: 13px; }
+.btn-send { -fx-background-color: #2f6fed; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; }
+.btn-send:disabled { -fx-opacity: 0.45; }
+.btn-leave { -fx-background-color: #d94141; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; }
+.btn-connect { -fx-background-color: #1b8a3a; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; }
