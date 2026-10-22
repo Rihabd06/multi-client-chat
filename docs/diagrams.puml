@@ -1,0 +1,66 @@
+' PlantUML sources (paste into https://www.plantuml.com/plantuml or use the IntelliJ PlantUML plugin).
+
+@startuml SequenceDiagram_Chat
+title Sequence - join, chat, allUsers, leave
+actor Alice
+participant "ClientApp\n(View)" as V
+participant "ChatClient\n(Model)" as C
+participant "ChatServer" as S
+participant "ClientHandler\n(virtual thread)" as H
+participant "Bob's ChatClient" as B
+
+Alice -> V : types username, clicks CONNECT
+V -> C : connect(host, port, "Alice")
+C -> S : TCP connect
+S -> H : new virtual thread
+C -> H : JOIN|Alice
+H -> S : admit(handler)
+H --> C : INFO|Welcome Alice!
+H -> B : INFO|Alice joined the chat
+Alice -> V : types "hello", presses Enter
+V -> C : submit("hello")
+C -> H : MSG|hello
+H -> S : broadcast(CHAT|time|Alice|hello)
+S --> C : CHAT|time|Alice|hello
+S --> B : CHAT|time|Alice|hello
+C --> V : onMessage(...)
+Alice -> V : types "allUsers"
+V -> C : submit("allUsers")
+C -> H : USERS
+H --> C : USERS|Alice,Bob
+C --> V : onUsers([Alice, Bob])
+Alice -> V : clicks LEAVE (or types end / bye)
+V -> C : disconnect()
+C -> H : BYE
+H -> S : remove(handler)
+S -> B : INFO|Alice left the chat
+C --> V : onDisconnected("You left the chat")
+@enduml
+
+@startuml UseCaseDiagram_Chat
+left to right direction
+title Use Case Diagram
+actor "Chat User" as U
+actor "Read-only Guest" as G
+rectangle "Chat Client" {
+  usecase "Enter username" as UC1
+  usecase "Send message" as UC2
+  usecase "Receive messages" as UC3
+  usecase "List active users (allUsers)" as UC4
+  usecase "Leave (LEAVE / end / bye)" as UC5
+}
+rectangle "Chat Server" {
+  usecase "Accept connections" as S1
+  usecase "Broadcast messages" as S2
+  usecase "Show users and log" as S3
+}
+U --> UC1
+U --> UC2
+U --> UC3
+U --> UC4
+U --> UC5
+G --> UC3
+UC2 ..> S2 : <<include>>
+UC1 ..> S1 : <<include>>
+S2 ..> S3 : <<extend>>
+@enduml

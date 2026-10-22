@@ -1,0 +1,39 @@
+digraph G {
+  rankdir=BT; fontname="Helvetica"; labelloc=t; label="Class Diagram - Multi-Client Chat (TCPServer + TCPClient)"; fontsize=18;
+  node [shape=record, fontname="Helvetica", fontsize=10, style=filled, fillcolor="#fdfdfd"];
+  edge [fontname="Helvetica", fontsize=9];
+
+  subgraph cluster_server { label="TCPServer project"; style=rounded; color="#2f6fed"; fontname="Helvetica";
+    TCPServer [label="{TCPServer|+ main(args: String[]) : void}", fillcolor="#e8f0ff"];
+    ServerApp [label="{«View»\nServerApp|- users: ObservableList\<String\>\l- colors: Map\<String,String\>\l- logArea: TextArea\l|+ start(stage: Stage) : void\l+ stop() : void\l+ onLog(message) : void\l+ onUserJoined(user) : void\l+ onUserLeft(user) : void\l- colorFor(user) : String\l}", fillcolor="#e8f0ff"];
+    SL [label="{«interface»\nServerListener|+ onLog(message: String)\l+ onUserJoined(username: String)\l+ onUserLeft(username: String)\l}", fillcolor="#fff4d6"];
+    ChatServer [label="{«Model»\nChatServer|- config: ServerConfig\l- listener: ServerListener\l- handlers: List\<ClientHandler\>\l- running: boolean\l|+ start() : void\l+ stop() : void\l~ admit(h) : boolean\l~ remove(h) : void\l~ broadcast(line: String) : void\l~ activeUsernames() : List\<String\>\l}", fillcolor="#e7f7e7"];
+    ClientHandler [label="{«Model»\nClientHandler|- server: ChatServer\l- socket: Socket\l- username: String\l|+ run() : void\l+ send(line: String) : void\l+ isReadOnly() : boolean\l}", fillcolor="#e7f7e7"];
+    ServerConfig [label="{«record»\nServerConfig|host: String\lport: int\l|+ load() : ServerConfig\l}", fillcolor="#e7f7e7"];
+  }
+
+  subgraph cluster_client { label="TCPClient project"; style=rounded; color="#1b8a3a"; fontname="Helvetica";
+    TCPClient [label="{TCPClient|+ main(args: String[]) : void}", fillcolor="#e8f0ff"];
+    ClientApp [label="{«View»\nClientApp|- config: ClientConfig\l- client: ChatClient\l- messages: TextArea\l- input: TextArea\l- statusLabel: Label\l- statusDot: Circle\l|+ start(stage: Stage) : void\l- connect() : void\l- sendInput() : void\l+ onMessage(m) : void\l+ onSystem(text) : void\l+ onUsers(users) : void\l+ onDisconnected(reason) : void\l}", fillcolor="#e8f0ff"];
+    CL [label="{«interface»\nChatClientListener|+ onMessage(m: ChatMessage)\l+ onSystem(text: String)\l+ onUsers(users: List\<String\>)\l+ onDisconnected(reason: String)\l}", fillcolor="#fff4d6"];
+    ChatClient [label="{«Model»\nChatClient|- socket: Socket\l- out: PrintWriter\l- connected: AtomicBoolean\l- readOnly: boolean\l|+ connect(host, port, username) : void\l+ submit(input: String) : void\l+ disconnect(reason: String) : void\l- readLoop() : void\l}", fillcolor="#e7f7e7"];
+    ChatMessage [label="{«record»\nChatMessage|time: String\lsender: String\ltext: String\l}", fillcolor="#e7f7e7"];
+    ClientConfig [label="{«record»\nClientConfig|host: String\lport: int\l|+ load() : ClientConfig\l+ fromArgs(args) : ClientConfig\l}", fillcolor="#e7f7e7"];
+  }
+
+  TCPServer -> ServerApp [label="launches", arrowhead=vee, style=dashed];
+  ServerApp -> SL [arrowhead=empty, style=dashed, label="implements"];
+  ServerApp -> ChatServer [label="1  uses", arrowhead=vee];
+  ChatServer -> SL [label="notifies", arrowhead=vee];
+  ChatServer -> ServerConfig [label="reads", arrowhead=vee];
+  ChatServer -> ClientHandler [label="0..*  creates", arrowhead=diamond, dir=back];
+  ClientHandler -> ChatServer [label="calls back", arrowhead=vee, style=dashed, constraint=false];
+
+  TCPClient -> ClientApp [label="launches", arrowhead=vee, style=dashed];
+  ClientApp -> CL [arrowhead=empty, style=dashed, label="implements"];
+  ClientApp -> ClientConfig [label="reads", arrowhead=vee];
+  ClientApp -> ChatClient [label="1  uses", arrowhead=vee];
+  ChatClient -> CL [label="notifies", arrowhead=vee];
+  ChatClient -> ChatMessage [label="creates", arrowhead=vee];
+  ChatClient -> ClientHandler [label="TCP line protocol\nJOIN|MSG|USERS|BYE", style=dotted, arrowhead=none, constraint=false, color="#b26a00", fontcolor="#b26a00"];
+}

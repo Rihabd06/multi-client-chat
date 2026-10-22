@@ -1,0 +1,14 @@
+digraph D {
+  rankdir=LR; fontname="Helvetica"; labelloc=t; label="Deployment Diagram - TCP/IP links between nodes"; fontsize=18; nodesep=0.5; ranksep=1.6;
+  node [fontname="Helvetica", fontsize=11, shape=box3d, style=filled];
+  edge [fontname="Helvetica", fontsize=10, penwidth=1.6, dir=both, color="#2f6fed", fontcolor="#2f6fed"];
+
+  server [fillcolor="#e7f7e7", label=<<B>«node» Server Machine</B><BR/>JVM 21 (virtual threads)<BR/><BR/>«artifact» TCPServer.jar<BR/>«artifact» config.properties<BR/>(server.ip, server.port=3000)<BR/><BR/>ServerSocket listening on :3000>];
+  c1 [fillcolor="#e8f0ff", label=<<B>«node» Client Machine 1</B><BR/>JVM 21 + JavaFX<BR/><BR/>«artifact» TCPClient.jar<BR/>user: Alice>];
+  c2 [fillcolor="#e8f0ff", label=<<B>«node» Client Machine 2</B><BR/>JVM 21 + JavaFX<BR/><BR/>«artifact» TCPClient.jar<BR/>user: Bob>];
+  c3 [fillcolor="#e8f0ff", label=<<B>«node» Client Machine N</B><BR/>JVM 21 + JavaFX<BR/><BR/>«artifact» TCPClient.jar<BR/>read-only guest>];
+
+  c1 -> server [label="TCP/IP socket\nlocalhost|server-IP:3000"];
+  c2 -> server [label="TCP/IP socket\nserver-IP:3000"];
+  c3 -> server [label="TCP/IP socket\nserver-IP:3000"];
+}
